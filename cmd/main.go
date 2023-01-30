@@ -27,6 +27,7 @@ func main() {
 	// 	// do something
 	// }
 	var i int = 0
+	var cnt int = 0
 
 	begin := time.Now()
 	fmt.Println("beginning scan")
@@ -39,26 +40,26 @@ func main() {
 
 		switch e := scanner.Object().(type) {
 		case *osm.Node:
-			// i = i + 1
-			// fmt.Println("-------------------")
-			// fmt.Println(e.ID)
-			// fmt.Println(e.XMLName.Local)
-			// fmt.Println(e.XMLName.Space)
-			// fmt.Println(e.Tags)
-			// fmt.Println("-------------------")
-
-			if e.Tags.HasTag("train") {
-				fmt.Println(e)
+			if e.Tags.HasTag("railway") {
+				cnt = cnt + 1
+				fmt.Println(e.Tags)
 			}
-
 		case *osm.Way:
+			if e.Tags.HasTag("railway") {
+				cnt = cnt + 1
+				fmt.Println(e.Tags)
+			}
 		case *osm.Relation:
+			if e.Tags.HasTag("railway") {
+				cnt = cnt + 1
+				fmt.Println(e.Tags)
+			}
 		}
 	}
 	end := time.Now()
 	fmt.Println(end)
 	fmt.Println(time.Since(begin))
 	fmt.Println("ending")
-
+	fmt.Println("theres ", cnt, "objects that have rails in it")
 	fmt.Println("scanning ", i, "objects from your file, thank me bitch")
 }
