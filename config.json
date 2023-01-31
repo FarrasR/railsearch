@@ -1,0 +1,13 @@
+{
+    "file_name": "java-latest.osm.pbf",
+    "search_tag": [
+        {
+            "name": "train",
+            "whitelist": ["yes"]
+        }
+    ],
+    "around_tag": [
+        {}
+    ],
+    "range": 100
+}

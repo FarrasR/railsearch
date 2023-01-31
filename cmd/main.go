@@ -62,4 +62,10 @@ func main() {
 	fmt.Println("ending")
 	fmt.Println("theres ", cnt, "objects that have rails in it")
 	fmt.Println("scanning ", i, "objects from your file, thank me bitch")
+
+	switch os.Args[1] {
+	case "read":
+	case "compare":
+	}
+
 }
