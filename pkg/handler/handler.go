@@ -1,48 +1,21 @@
 package handler
 
 import (
-	"fmt"
+	"railsearch/pkg/config"
 
 	"github.com/paulmach/osm"
 )
 
 type Handler interface {
+	SetConfig(config.RailsearchConfig)
+	GetSkips() SkipObject
 	HandleNode(chan *osm.Node)
 	HandleWay(chan *osm.Way)
 	HandleRelation(chan *osm.Relation)
 }
 
-type NodeHandler struct {
-}
-
-func NewNodeHandler() Handler {
-	return &NodeHandler{}
-}
-
-func (*NodeHandler) HandleNode(channel chan *osm.Node) {
-	for b := range channel {
-		if b == nil {
-			break
-		}
-		fmt.Println(b.Tags)
-	}
-	fmt.Println("wadidau")
-}
-
-func (*NodeHandler) HandleWay(channel chan *osm.Way) {
-	for b := range channel {
-		if b == nil {
-			break
-		}
-		fmt.Println(b.Tags)
-	}
-}
-
-func (*NodeHandler) HandleRelation(channel chan *osm.Relation) {
-	for b := range channel {
-		if b == nil {
-			break
-		}
-		fmt.Println(b.Tags)
-	}
+type SkipObject struct {
+	SkipRelation bool
+	SkipWay      bool
+	SkipNode     bool
 }

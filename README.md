@@ -6,6 +6,10 @@ It will get tags from a json file, the program then will search objects on \*.os
 
 Currently only support nodes on osm, somethign like railway(a way) not supported
 
+## Weakness
+
+Yep, its on latitude longitude, its 
+
 ## Instruction
 If you run/build this on windows (KEK), tough luck, theres a lot of dependencies you need to install which I won't cover (I tried running this on windows to no avail), the recommended way to run/build this on windows is via wsl, and these instructions assumed you already familiar with linux/wsl
 
@@ -17,4 +21,4 @@ If you run/build this on windows (KEK), tough luck, theres a lot of dependencies
 Thanks to DennyDark for helping me with the formula
 
 ## License
-licensed under GNU General Public License version 3
+licensed under GNU General Public License version 3. contact me if you want to include this on your non GPL program :)))))

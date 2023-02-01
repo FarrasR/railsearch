@@ -2,9 +2,11 @@ package scanner
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"railsearch/pkg/config"
 	"railsearch/pkg/handler"
+	"time"
 
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
@@ -32,15 +34,40 @@ func (rScan *RailsearchScanner) Scan() {
 
 	scanner := osmpbf.New(context.Background(), f, 3)
 	defer scanner.Close()
+
 	nodechan := make(chan *osm.Node)
 	waychan := make(chan *osm.Way)
 	relationchan := make(chan *osm.Relation)
+	rScan.Handler.SetConfig(rScan.Config)
+
+	skip := rScan.Handler.GetSkips()
+
+	if skip.SkipNode {
+		scanner.SkipNodes = true
+	}
+
+	if skip.SkipRelation {
+		scanner.SkipRelations = true
+	}
+
+	if skip.SkipWay {
+		scanner.SkipWays = true
+	}
 
 	go rScan.Handler.HandleRelation(relationchan)
 	go rScan.Handler.HandleNode(nodechan)
 	go rScan.Handler.HandleWay(waychan)
 
+	fmt.Println("BEGINNING SCANNING BEEP")
+	beginTime := time.Now()
+
+	i := 0
 	for scanner.Scan() {
+		i = i + 1
+
+		if i%10000 == 0 {
+			fmt.Println("searching ", i, "objects")
+		}
 		object := scanner.Object()
 		switch object.(type) {
 		case *osm.Node:
@@ -51,4 +78,13 @@ func (rScan *RailsearchScanner) Scan() {
 			relationchan <- object.(*osm.Relation)
 		}
 	}
+
+	fmt.Println("DONE SCANNING, THANK ME BITCH")
+	fmt.Println("Scan begins at: ", beginTime)
+	fmt.Println("Scan ends   at: ", time.Now())
+	fmt.Println("Time   elapsed: ", time.Since(beginTime))
+
+	close(nodechan)
+	close(waychan)
+	close(relationchan)
 }
