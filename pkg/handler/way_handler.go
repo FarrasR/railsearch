@@ -18,7 +18,7 @@ func NewWayHandler() Handler {
 func (h *WayHandler) HandleNode(channel chan *osm.Node) {
 	for b := range channel {
 		var wayNode database.WayMember
-		if err := database.GetConn().First(&wayNode, "node_id = ?", int64(b.ID)).Error; err == nil {
+		if err := database.GetConn().Unscoped().First(&wayNode, "node_id = ?", int64(b.ID)).Error; err == nil {
 			way := database.Way{
 				WayId:     int64(b.ID),
 				Latitude:  b.Lat,
