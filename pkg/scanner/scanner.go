@@ -43,14 +43,17 @@ func (rScan *RailsearchScanner) Scan() {
 	skip := rScan.Handler.GetSkips()
 
 	if skip.SkipNode {
+		fmt.Println("SkipNode")
 		scanner.SkipNodes = true
 	}
 
 	if skip.SkipRelation {
+		fmt.Println("SkipRelation")
 		scanner.SkipRelations = true
 	}
 
 	if skip.SkipWay {
+		fmt.Println("SkipWay")
 		scanner.SkipWays = true
 	}
 
@@ -64,9 +67,8 @@ func (rScan *RailsearchScanner) Scan() {
 	i := 0
 	for scanner.Scan() {
 		i = i + 1
-
 		if i%10000 == 0 {
-			fmt.Println("searching ", i, "objects")
+			fmt.Println("scanning", i)
 		}
 		object := scanner.Object()
 		switch object.(type) {

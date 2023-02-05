@@ -4,6 +4,8 @@ import (
 	"railsearch/pkg/config"
 	"railsearch/pkg/database"
 
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/project"
 	"github.com/paulmach/osm"
 )
 
@@ -17,14 +19,19 @@ func NewSearchHandler() Handler {
 
 func (h *SearchHandler) HandleNode(channel chan *osm.Node) {
 	for b := range channel {
-		if h.validTags(b.Tags) {
-			node := database.Node{
-				NodeId:    int64(b.ID),
-				Latitude:  b.Lat,
-				Longitude: b.Lon,
-			}
-			database.GetConn().Create(&node)
+		mercator := project.Point(orb.Point{b.Lon, b.Lat}, project.WGS84.ToMercator)
+		node := database.Node{
+			NodeId:     int64(b.ID),
+			Latitude:   b.Lat,
+			Longitude:  b.Lon,
+			CartesianX: mercator.X(),
+			CartesianY: mercator.Y(),
+			IsBuilding: false,
 		}
+		if h.validTags(b.Tags) {
+			node.IsBuilding = true
+		}
+		database.GetConn().Create(&node)
 	}
 }
 

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"railsearch/pkg/config"
-	"railsearch/pkg/database"
 
 	"github.com/paulmach/osm"
 )
@@ -16,16 +15,16 @@ func NewWayHandler() Handler {
 }
 
 func (h *WayHandler) HandleNode(channel chan *osm.Node) {
-	for b := range channel {
-		var wayNode database.WayMember
-		if err := database.GetConn().Unscoped().First(&wayNode, "node_id = ?", int64(b.ID)).Error; err == nil {
-			way := database.Way{
-				WayId:     int64(b.ID),
-				Latitude:  b.Lat,
-				Longitude: b.Lon,
-			}
-			database.GetConn().Create(&way)
-		}
+	for _ = range channel {
+		// var wayNode database.WayMember
+		// if err := database.GetConn().Unscoped().First(&wayNode, "node_id = ?", int64(b.ID)).Error; err == nil {
+		// 	way := database.Way{
+		// 		WayId:     int64(b.ID),
+		// 		Latitude:  b.Lat,
+		// 		Longitude: b.Lon,
+		// 	}
+		// 	database.GetConn().Create(&way)
+		// }
 	}
 }
 
