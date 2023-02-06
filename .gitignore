@@ -1,3 +1,5 @@
 
 java-latest.osm.pbf
 config.json
+*.pbf
+*.osm

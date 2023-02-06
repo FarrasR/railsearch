@@ -58,7 +58,7 @@ func (rScan *RailsearchScanner) Scan() {
 	go rScan.Handler.HandleNode(nodechan)
 	go rScan.Handler.HandleWay(waychan)
 
-	fmt.Println("BEGINNING SCANNING BEEP")
+	fmt.Println("BEGINNING SCANNING AT", time.Now())
 	beginTime := time.Now()
 
 	i := 0
@@ -66,8 +66,9 @@ func (rScan *RailsearchScanner) Scan() {
 		i = i + 1
 
 		if i%10000 == 0 {
-			fmt.Println("searching ", i, "objects")
+			fmt.Println("scanning", i, "objects")
 		}
+
 		object := scanner.Object()
 		switch object.(type) {
 		case *osm.Node:

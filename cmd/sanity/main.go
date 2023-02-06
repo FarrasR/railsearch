@@ -11,9 +11,6 @@ func main() {
 	config := config.GetConfig("config.json")
 	database.InitDB(config.DatabaseConfig)
 
-	// scan_search := scanner.NewScanner(config, handler.NewSearchHandler())
-	// scan_search.Scan()
-
-	scan_way := scanner.NewScanner(config, handler.NewWayHandler())
-	scan_way.Scan()
+	scan_search := scanner.NewScanner(config, handler.NewSanityHandler())
+	scan_search.Scan()
 }

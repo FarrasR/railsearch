@@ -9,92 +9,40 @@ import (
 	"gorm.io/gorm"
 )
 
-var V20230201 = gormigrate.Migration{
-	ID: "V20230201",
+var V20230205 = gormigrate.Migration{
+	ID: "V20230205",
 	Migrate: func(tx *gorm.DB) error {
 		type Node struct {
-			gorm.Model
-			NodeId    int64   `gorm:"index"`
-			Latitude  float64 `gorm:"index:location_node"`
-			Longitude float64 `gorm:"index:location_node"`
+			NodeId    int64 `gorm:"primaryKey"`
+			Latitude  float64
+			Longitude float64
 		}
 
-		type Way struct {
-			gorm.Model
-			WayId     int64   `gorm:"index"`
-			Latitude  float64 `gorm:"index:location_way"`
-			Longitude float64 `gorm:"index:location_way"`
+		type IndexNode struct {
+			NodeId     int64   `gorm:"primaryKey"`
+			CartesianX float64 `gorm:"index:cartesian_way"`
+			CartesianY float64 `gorm:"index:cartesian_way"`
 		}
 
-		type WayMember struct {
-			gorm.Model
+		type WayNode struct {
+			ID     uint  `gorm:"primaryKey"`
 			WayId  int64 `gorm:"index"`
 			NodeId int64 `gorm:"index"`
 			Order  int
 		}
 
-		return tx.AutoMigrate(&Node{}, &Way{}, &WayMember{})
+		type TargetNode struct {
+			OsmId     int64 `gorm:"primaryKey"`
+			Latitude  float64
+			Longitude float64
+			Tags      string
+			Type      string `gorm:"type:varchar(10)"`
+		}
+
+		return tx.AutoMigrate(&Node{}, &IndexNode{}, &WayNode{}, TargetNode{})
 	},
 	Rollback: func(tx *gorm.DB) error {
-		return tx.Migrator().DropTable("node", "way", "way_member")
-	},
-}
-
-var V20230203 = gormigrate.Migration{
-	ID: "V20230203",
-	Migrate: func(tx *gorm.DB) error {
-		type Node struct {
-			gorm.Model
-			NodeId     int64   `gorm:"index"`
-			Latitude   float64 `gorm:"index:location_node"`
-			Longitude  float64 `gorm:"index:location_node"`
-			CartesianX float64 `gorm:"index:cartesian_node"`
-			CartesianY float64 `gorm:"index:cartesian_node"`
-		}
-
-		type Way struct {
-			gorm.Model
-			WayId      int64   `gorm:"index"`
-			Latitude   float64 `gorm:"index:location_way"`
-			Longitude  float64 `gorm:"index:location_way"`
-			CartesianX float64 `gorm:"index:cartesian_way"`
-			CartesianY float64 `gorm:"index:cartesian_way"`
-		}
-
-		return tx.AutoMigrate(&Node{}, &Way{})
-	},
-	Rollback: func(tx *gorm.DB) error {
-		err := tx.Migrator().DropIndex("nodes", "cartesian_node")
-		if err != nil {
-			return err
-		}
-
-		err = tx.Migrator().DropIndex("ways", "cartesian_way")
-		if err != nil {
-			return err
-		}
-
-		err = tx.Migrator().DropColumn("nodes", "cartesian_x")
-		if err != nil {
-			return err
-		}
-
-		err = tx.Migrator().DropColumn("nodes", "cartesian_y")
-		if err != nil {
-			return err
-		}
-
-		err = tx.Migrator().DropColumn("ways", "cartesian_x")
-		if err != nil {
-			return err
-		}
-
-		err = tx.Migrator().DropColumn("ways", "cartesian_y")
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return tx.Migrator().DropTable("nodes", "target_nodes", "way_nodes")
 	},
 }
 
@@ -103,8 +51,7 @@ func main() {
 	database.InitDB(config.DatabaseConfig)
 
 	m := gormigrate.New(database.GetConn(), gormigrate.DefaultOptions, []*gormigrate.Migration{
-		&V20230201,
-		&V20230203,
+		&V20230205,
 	})
 	if err := m.Migrate(); err != nil {
 		log.Fatalf("Could not migrate: %v", err)

@@ -4,35 +4,44 @@ import (
 	"railsearch/pkg/config"
 	"railsearch/pkg/database"
 
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/project"
 	"github.com/paulmach/osm"
 )
 
-type SearchHandler struct {
+type IndexHandler struct {
 	Conf config.RailsearchConfig
 }
 
 func NewSearchHandler() Handler {
-	return &SearchHandler{}
+	return &IndexHandler{}
 }
 
-func (h *SearchHandler) HandleNode(channel chan *osm.Node) {
+func (h *IndexHandler) HandleNode(channel chan *osm.Node) {
 	for b := range channel {
+		node := database.Node{
+			NodeId:    int64(b.ID),
+			Latitude:  b.Lat,
+			Longitude: b.Lon,
+		}
+		database.GetConn().Create(&node)
 		if h.validTags(b.Tags) {
-			node := database.Node{
-				NodeId:    int64(b.ID),
-				Latitude:  b.Lat,
-				Longitude: b.Lon,
+			mercator := project.Point(orb.Point{b.Lon, b.Lat}, project.WGS84.ToMercator)
+			indexNode := database.IndexNode{
+				NodeId:     int64(b.ID),
+				CartesianX: mercator.X(),
+				CartesianY: mercator.Y(),
 			}
-			database.GetConn().Create(&node)
+			database.GetConn().Create(&indexNode)
 		}
 	}
 }
 
-func (h *SearchHandler) HandleWay(channel chan *osm.Way) {
+func (h *IndexHandler) HandleWay(channel chan *osm.Way) {
 	for b := range channel {
 		if h.validTags(b.Tags) {
 			for i, val := range b.Nodes {
-				way := database.WayMember{
+				way := database.WayNode{
 					WayId:  int64(b.ID),
 					NodeId: int64(val.ID),
 					Order:  i,
@@ -43,22 +52,22 @@ func (h *SearchHandler) HandleWay(channel chan *osm.Way) {
 	}
 }
 
-func (h *SearchHandler) HandleRelation(channel chan *osm.Relation) {
+func (h *IndexHandler) HandleRelation(channel chan *osm.Relation) {
 }
 
-func (h *SearchHandler) SetConfig(conf config.RailsearchConfig) {
+func (h *IndexHandler) SetConfig(conf config.RailsearchConfig) {
 	h.Conf = conf
 }
 
-func (h *SearchHandler) GetSkips() SkipObject {
+func (h *IndexHandler) GetSkips() SkipObject {
 	return SkipObject{
 		SkipRelation: true,
-		SkipWay:      false,
+		SkipWay:      true,
 		SkipNode:     false,
 	}
 }
 
-func (h *SearchHandler) validTags(tags osm.Tags) bool {
+func (h *IndexHandler) validTags(tags osm.Tags) bool {
 	for _, tc := range h.Conf.SearchTag {
 		found := tags.Find(tc.TagName)
 		if found != "" {
