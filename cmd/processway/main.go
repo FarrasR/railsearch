@@ -47,9 +47,8 @@ func main() {
 		}
 		database.GetConn().Create(&indexNode)
 	}
-
+	fmt.Println("Converting", i, "ways")
 	fmt.Println("Conversion begins at:", beginTime)
 	fmt.Println("Conversion ends   at:", time.Now())
 	fmt.Println("Time         elapsed:", time.Since(beginTime))
-
 }

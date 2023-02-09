@@ -8,7 +8,14 @@
             "name":"railway"
         }
     ],
-    "around_tag": [],
+    "around_tag": [
+        {
+            "name": "building"
+        },
+        {
+            "name": "amenity"
+        }
+    ],
     "range": 100,
     "database_config":{
         "username": "root",

@@ -1,4 +1,4 @@
-.PHONY: migrate index processway target
+.PHONY: migrate index processway target sanity
 
 migrate:
 	go run ./cmd/database/main.go
